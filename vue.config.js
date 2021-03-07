@@ -13,6 +13,11 @@ const name = defaultSettings.title || 'vue Element Admin' // page title
 const port = 9527 // dev port
 
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
+const TestWebpackPlugin = require('./src/plugin/test')
+
+const compress = new TestWebpackPlugin({
+})
+
 module.exports = {
   /**
    * You will need to set publicPath if you plan to deploy your site under a sub path,
@@ -54,11 +59,20 @@ module.exports = {
       alias: {
         '@': resolve('src')
       }
-    }
+    },
+    plugins: [compress]
+
   },
   chainWebpack(config) {
     config.plugins.delete('preload') // TODO: need test
     config.plugins.delete('prefetch') // TODO: need test
+
+    /* config.module
+      .rule('test') // 规则名称，可以自定义
+      .test(/\.js$/) // 正则：你想要使用这个loader处理什么文件  这里因为我想处理的是 index.html 文件中的 sdk 引入
+      .use('./src/loader/test') // 我遇到的坑在这里 ！！！
+      .loader('./src/loader/test') // 这里同上
+      .end() */
 
     // set svg-sprite-loader
     config.module
@@ -97,11 +111,20 @@ module.exports = {
     config
       .when(process.env.NODE_ENV !== 'development',
         config => {
+          /* config
+            .plugin('CopyrightWebpackPlugin')
+            .after('html')
+
+            .use(require('./src/plugin/test'), [{
+              // `runtime` must same as runtimeChunk name. default is `runtime`
+              inline: /runtime\..*\.js$/
+            }])
+            .end() */
           config
             .plugin('ScriptExtHtmlWebpackPlugin')
             .after('html')
             .use('script-ext-html-webpack-plugin', [{
-            // `runtime` must same as runtimeChunk name. default is `runtime`
+              // `runtime` must same as runtimeChunk name. default is `runtime`
               inline: /runtime\..*\.js$/
             }])
             .end()
